@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Word Guess Game</title>
+  
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="C:\Users\rajni\OneDrive\Desktop\BCS Notes\week4Homework2\Word-Guess-Game\assets\css\style.css">
+
+  
+</head>
+
+<body>
+
+  <div class="content-wrapper">
+    <div class="content-box clearfix">
+        <h1>Word Guess Game</h1>
+
+        <hr />
+      <div class="column">
+
+        <h2>Favorite Characters</h2>
+        <div class="game-message">
+          <span id="game-message">Press any key to get started.</span>
+        </div>
+        <div class="word-display">
+          WORD: <span id="word-display"></span>
+        </div>
+        <div class="wrong-letters">
+          Wrong Letters:
+          <span id="wrong-letters"></span>
+        </div>
+        <div class="guesses-left">
+          Guesses Left:
+          <span id="guesses-left"></span>
+        </div>
+      </div>
+      <div id="win-img" class="column middle">
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+
+    // Javascript Variables Representing Page Elements That allow the Program to display to the Screen---//
+    var gameMsgTxt = document.getElementById("game-message");
+    var letterTxt = document.getElementById("letter-input");
+    var wrongLettersTxt = document.getElementById("wrong-letters");
+    var guessesLeftTxt = document.getElementById("guesses-left");
+    var wordDisplayTxt = document.getElementById("word-display");
+    var imgDiv = document.getElementById("win-img");
+
+
+       // Javascript Game Variables
+    var gameInProgress = 0;   //used to reset 
+    var hangmanWord;          //The word to guess
+    var answerArray;          //The blank spaces for each letter of the word and correct letters
+    var wrongLetters;         //guessed wrong letters
+    var guessesLeft;         //start with 10 guesses
+
+    // Javascript Messages to the Player To Be Displayed on the Screen
+    var INTERIM_MSG = 'WORD GUESS GAME';
+    var START_MSG = 'Press any key to get started.';
+    var WIN_MSG = 'You WIN!';
+    var LOSE_MSG = 'Boo, you lose!';
+    var GUESS_CORRECT = "You guessed a letter!"
+    var GUESS_INCORRECT = "OMG.  That letter isn't in the word."
+    var ERR_MSG_NOT_ALPHA = 'That is not a letter.';
+    var ERR_MSG_REPEAT = 'You already guessed that letter.';
+
+    var DEBUG = false;
+
+    //when a game is completed and a new one needs to be set up
+    resetGame();
+
+    // Listen for the User Keypresses and Play the Game
+    
+    document.onkeyup = function (event) {
+
+      if (!gameInProgress) {
+        gameMsgTxt.textContent = INTERIM_MSG;
+        return;
+      }
+      var userGuess = event.key;
+      if (DEBUG) console.log(userGuess);
+      //check that its a letter
+      if (!gameInProgress) resetGame();
+      if (!isValidEntry(userGuess)) {
+        //if not a letter send user a message
+        if (DEBUG) console.log(ERR_MSG_NOT_ALPHA);
+        gameMsgTxt.textContent = ERR_MSG_NOT_ALPHA;
+        return;
+      }
+
+      //check that letter against the previous.correct AND incorrect guesses and if already guessed send user a message
+      if ((answerArray.indexOf(userGuess) > -1) ||
+        wrongLetters.indexOf(userGuess) > -1) {
+        gameMsgTxt.textContent = ERR_MSG_REPEAT;
+        return;
+      }
+      
+      if (DEBUG) console.log("Word index: " + hangmanWord.toLowerCase().indexOf(userGuess.toLowerCase()));
+      //check that letter against the word
+      if (hangmanWord.toLowerCase().indexOf(userGuess.toLowerCase()) !== -1) {
+
+        
+        gameMsgTxt.textContent = GUESS_CORRECT;
+        
+        answerArray = updateAnswerArray(userGuess, hangmanWord, answerArray);
+        wordDisplayTxt.innerHTML = "";
+        for (var i = 0; i < answerArray.length; i++) {
+          wordDisplayTxt.innerHTML += answerArray[i] + "&nbsp;";
+        }
+        //check to see if the user has won. if the user has won than toString() had commas making the word comparison fail
+        //@todo - should I be using ===
+        if (answerArray.join('') == hangmanWord) {
+          winGame();
+        }
+        
+        //resetGame();
+      } else {
+        //if the letter guessed is the wrong letter than update the guesses if wrong letter
+        gameMsgTxt.textContent = GUESS_INCORRECT;
+        wrongLetters.push(userGuess);
+        wrongLettersTxt.textContent = wrongLetters;
+        //Take away a guess if the user guesses the wrong letter
+        wrongGuessesMade++;
+        guessesLeftTxt.innerHTML = 10 - wrongGuessesMade;
+        //check to see if the user has any guesses left
+        if (wrongGuessesMade < 10) {
+          return;
+        } else {
+          //if no guesses are left then lose and end the game
+          loseGame();
+          //ending the game means revealing the word and resetting the game to allow a new one to start
+        }
+      }
+
+    }
+
+    // Set UP a New Game
+    
+    function resetGame() {
+      if (DEBUG) console.log("reset");
+      gameInProgress = true;
+      hangmanWord = pickWord();
+      answerArray = null;
+      answerArray = setupAnswerArray(hangmanWord);
+      wrongLetters = new Array(); 
+      wrongLettersTxt.textContent = "";
+      wrongGuessesMade = 0;
+      gameMsgTxt.textContent = START_MSG;
+      wordDisplayTxt.innerHTML = "";
+      guessesLeftTxt.innerHTML = "10";
+      for (var i = 0; i < answerArray.length; i++) {
+        wordDisplayTxt.innerHTML += answerArray[i] + "&nbsp;";
+      }
+      if (imgDiv.hasChildNodes()) { imgDiv.innerHTML = ""; }
+      // imgDiv.removeChild('img');
+    }
+
+    // Return a random word
+    function pickWord() {
+      if (DEBUG) console.log("hangmanGame pickWord");
+      var wordsToGuess = ["CoronaVirus", "Drake", "JackieChan", "LionelMessi", "MiamiBeach", "Shakira", "TheRock", "WillSmith"];
+
+      var word = wordsToGuess[Math.floor(Math.random() * wordsToGuess.length)];
+      if (DEBUG) console.log("word guess pick word: " + word);
+      return word;
+    }
+    
+    function setupAnswerArray(word) {
+      if (DEBUG) console.log("setupAnswerArray for: " + word);
+      var answerArray = [];
+      for (var i = 0; i < word.length; i++) {
+        answerArray[i] = "_";
+      }
+      return answerArray;
+    }
+
+    // Update answerArray and return a number showing how many times the guess appears in the word so remainingLetters
+      function updateAnswerArray(guess, word, answerArray) {
+      if (DEBUG) console.log("guess: " + guess + " word: " + hangmanWord + " answerArray: " + answerArray);
+      var lettersFound = 0;
+      for (var i = 0; i < word.length; i++) {
+        if (word[i].toLowerCase() === guess.toLowerCase()) {
+          answerArray[i] = word[i];
+          lettersFound++;
+        }
+      }
+      return answerArray;
+    };
+
+       function isValidEntry(letter) {
+      var isValid = /^[A-Za-z]$/.test(letter);
+      if (DEBUG) console.log("isValidEntry( " + letter + " ): " + isValid);
+      if (isValid) { return true; }
+      else { return false; }
+    }
+
+    function winGame() {
+      if (DEBUG) console.log("Win game");
+      gameMsgTxt.textContent = WIN_MSG;
+      showImg();
+      gameInProgress = false;
+
+      setTimeout(function () {
+        gameMsgTxt.textContent = START_MSG;
+        resetGame();
+      }, 5000);
+    }
+
+    function loseGame() {
+      if (DEBUG) console.log("Lose Game");
+      gameMsgTxt.textContent = LOSE_MSG;
+      var correctAnswer = hangmanWord.split('').join(" ");
+      //reveal word
+      wordDisplayTxt.textContent = correctAnswer;
+      showImg();
+      gameInProgress = false;
+
+      setTimeout(function () {
+        gameMsgTxt.textContent = START_MSG;
+        resetGame();
+      }, 5000);
+    }
+    function showImg() { 
+      var winnerImgElem = document.createElement('img'); 
+      winnerImgElem.src = "images/" + hangmanWord + ".jpg";
+      winnerImgElem.id = "word-image";
+      imgDiv.appendChild(winnerImgElem);
+    }
+  
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+* {
+    box-sizing: border-box;
+}
+  
+  body {
+    background-image: url("C:\Users\rajni\OneDrive\Desktop\BCS Notes\week4Homework2\Word-Guess-Game\assets\images\Back Ground.jpg"); 
+    height: 100%; 
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+    font-style: italic;
+  
+    color: #777777;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+h1 {
+    color: rgb(7, 54, 161);
+}
+.glass {
+    background-color: rgba(43, 2, 2, 0.432);
+   
+    backdrop-filter: blur(5px);   
+    -webkit-backdrop-filter: blur(5px);  
+    
+}
+  
+  .content-wrapper {
+      margin: 0;
+      width: 100%;
+      text-align: left;
+      padding-left: 50px;
+  }
+
+  .content-box {
+      max-width: 880px;
+      margin-bottom: 50px;
+      margin-top: 50px; 
+      padding: 10px 40px 10px 40px;
+      background-color: rgba(255, 255, 255, 0.85); 
+    border: 1px solid #888888;
+
+    -moz-box-shadow: -3px 3px 5px #888888;
+    -webkit-box-shadow: -3px 3px 5px #888888;
+    box-shadow: -3px 3px 5px #888888;
+
+}
+
+  .middle > * {
+    vertical-align: middle;
+  }
+  #word-image {
+    padding-top:50px;
+    max-width: 300px;
+  }
+  .win-image {
+    height: 100%;
+  }
+  .column {
+    width: 50%;
+    float: left;
+  }
+
+  .clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+@media screen and (max-width: 600px) {
+
+    .content-wrapper {
+      padding-left: 0;
+    }
+    .column {
+    width: 100%;
+  }
+}
