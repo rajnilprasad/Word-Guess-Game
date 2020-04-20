@@ -3,14 +3,16 @@
 }
   
   body {
-    background-image: url("C:\Users\rajni\OneDrive\Desktop\BCS Notes\week4Homework2\Word-Guess-Game\assets\images\Back Ground.jpg"); 
+    background-image: url(https://wallpapercave.com/wp/wp30509.jpg); 
+    background-color: gray;
+    background-image: 
     height: 100%; 
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center; 
     font-style: italic;
   
-    color: #777777;
+    color: goldenrod;
     font-family: 'Montserrat', sans-serif;
     font-size: 18px;
     line-height: 1.6;
